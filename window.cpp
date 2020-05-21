@@ -5,20 +5,20 @@ Window::Window(): name("MIPTime") {}
 Window::Window(std::string name): name(name) {}
 
 void Window::open() {
-	cv::namedWindow("MIPTime", cv::WINDOW_AUTOSIZE);
+	cv::namedWindow(name, cv::WINDOW_AUTOSIZE);
 }
 
 int Window::show(cv::Mat frame, int wait=10) {
-	cv::imshow("MIPTime", frame);
+	cv::imshow(name, frame);
 	return cv::waitKey(wait);
 }
 
 int Window::show_jpeg(std::vector <unsigned char> buff, int wait=10) {
 	cv::Mat frame = cv::imdecode(buff, CV_LOAD_IMAGE_COLOR);
-    cv::imshow("MIPTime", frame);
+    cv::imshow(name, frame);
 	return cv::waitKey(wait);
 }
 
 void Window::close() {
-    cv::destroyWindow("MIPTime");
+    cv::destroyWindow(name);
 }

@@ -16,13 +16,13 @@ cv::Mat Camera::get_frame() {
 	return frame;
 }
 
-std::vector <unsigned char> Camera::get_jpeg_frame() {
+std::vector <unsigned char> Camera::get_jpeg_frame(int quality=20) {
 	cv::Mat frame = get_frame();
 
 	std::vector <unsigned char> buff;                  //buffer for coding
 	std::vector <int> param(2);
 	param[0] = cv::IMWRITE_JPEG_QUALITY;
-	param[1] = 20;                             //default(95) 0-100
+	param[1] = quality;                             //default(95) 0-100
 	cv::imencode(".jpg", frame, buff, param);
 
 	return buff;
