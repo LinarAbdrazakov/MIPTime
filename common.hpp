@@ -14,5 +14,5 @@
 #include <vector>
 #include <string>
 
-#define MAX_SIZE 20480
+#define MAX_SIZE 30000
 //=============================================================================
