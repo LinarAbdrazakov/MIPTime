@@ -18,7 +18,7 @@
 #include <vector>
 #include <string>
 
-const int MAX_SIZE = 1024;
+const int MAX_SIZE = 1024 * 1024;
 //=============================================================================
 class Server
 {
@@ -150,7 +150,7 @@ void Server::UsersWaiting()
     {
       AddUser();
       std::cout << "User joined\n"; 
-      Send("Hello, you are the first \0one, wait for the second user\n", keys_[0], 100);    
+      Send("Hello, you are the first one, wait for the second user\n", keys_[0], 100);    
     }
 
     AddUser();
