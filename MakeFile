@@ -2,11 +2,14 @@
 CC=g++
 C=gcc
 #==============================================================================
-chat: 	connection.cpp   \
-			./client.cpp 		   \
-			./server.cpp
-	$(CC)	client.cpp camera.cpp window.cpp -fpermissive -pthread -o c `pkg-config --cflags --libs opencv`
-	$(CC)	server.cpp -pthread -o s
+chat: server client
+	 
+server: Main_server.cpp Server.cpp  Server.hpp Common.hpp
+	$(CC)	Server.cpp Main_server.cpp -pthread -o s
+	
+client: Main_client.cpp Client.cpp Client.hpp camera.cpp window.cpp camera.h window.h Common.hpp
+	$(CC)	Client.cpp Main_client.cpp camera.cpp window.cpp -fpermissive -pthread -o c `pkg-config --cflags --libs opencv`
+	
 #==============================================================================
 clean:
 	rm -rf *.o *.gch

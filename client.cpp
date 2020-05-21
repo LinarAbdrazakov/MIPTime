@@ -1,57 +1,52 @@
-#include <iostream>
-#include <vector>
-#include <sys/types.h>
-#include <unistd.h>
-#include <time.h>
-#include "opencv2/opencv.hpp"
-
-#include "connection.cpp"
-#include "camera.h"
-#include "window.h"
-
-int main(int argc, char *argv[])
+//=============================================================================
+#include "Client.hpp"
+//=============================================================================
+Client::Client(int32_t port)
 {
-  Camera camera;
-  Window window;
+  port_ = port;
+  fd_   = socket(AF_INET, SOCK_STREAM, 0);
+  if (fd_ < 0) std::cout << "ERROR : Could not create socket \n";
 
-  camera.open();
-  std::cout << "Camera is opened" << std::endl;
+  memset(&addr_, '0', sizeof(addr_));
+  addr_.sin_family = AF_INET;
+  addr_.sin_port   = htons(port_);
 
-  char buffer[MAX_SIZE];
-  memset(buffer, 0, MAX_SIZE);
-  Client c(25572);
-  c.Connect("109.71.10.212");
-
-  c.Read(buffer);
-  std::cout << buffer;
-
-  int pid = fork();
-
-  while (true) {
-    if (pid != 0) {
-      memset(buffer, 0, MAX_SIZE);
-      int size = c.Read(buffer);
-
-      std::vector <unsigned char> buff_2(buffer, buffer + size);
-      std::cout << "Size of recieved buffer: " << buff_2.size() << std::endl;
-
-      int key = window.show_jpeg(buff_2, 10);
-
-      if(key == 27) { // stop capturing by pressing ESC
-        char pid_str[50];
-        sprintf(pid_str, "%d", pid);
-        execlp("kill", "kill", pid_str, (char *)NULL);
-        break;
-      } 
-
-    } else {
-      std::vector <unsigned char> buff = camera.get_jpeg_frame();
-      c.Send(buff.data(), buff.size());
-      std::cout << "Size of sent buffer: " << buff.size() << std::endl;
-      usleep(40000);
-    }
+  std::cout << "Client created!\n";
+}
+//=============================================================================
+Client::~Client()
+{
+  std::cout << "Client destroyed!\n";
+}
+//=============================================================================
+int32_t Client::Connect(const char *address)
+{ 
+  if(inet_pton(AF_INET, address, &addr_.sin_addr) <= 0)
+  {
+    std::cout << "ERROR : inet_pton error occured\n";
+    return -1;
+  }
+ 
+  if (connect(fd_, (struct sockaddr *)&addr_, sizeof(addr_)) < 0)
+  {
+    std::cout << "ERROR : Connect Failed \n";
+    return -1;
   }
 
-
-  window.close();
-}//93.175.1.18
+  return 0;
+}
+//=============================================================================
+int32_t Client::Send(const char *msg, int32_t length = -1)
+{
+  if (length == -1) length = strlen(msg);
+  send(fd_, msg, length, 0); 
+  std::cout << "Message sent\n";   
+}
+//=============================================================================
+int32_t Client::Read(char *msg)
+{
+  int32_t value;
+  value = read( fd_ , msg, MAX_SIZE); 
+  return value;
+}
+//=============================================================================
