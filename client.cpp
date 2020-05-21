@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
   char buffer[MAX_SIZE];
   memset(buffer, 0, MAX_SIZE);
   Client c(25572);
-  c.Connect("127.0.0.2");
+  c.Connect("109.71.10.212");
 
   c.Read(buffer);
   std::cout << buffer;

@@ -14,7 +14,7 @@ public:
 	Window(std::string);
 
 	void open();
-	int show(cv::Mat frame);	
-	int show_jpeg(std::vector <uchar> buff);
+	int show(cv::Mat frame, int wait);	
+	int show_jpeg(std::vector <unsigned char> buff, int wait);
 	void close();
 };

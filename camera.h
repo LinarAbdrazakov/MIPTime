@@ -13,5 +13,5 @@ public:
 	Camera();
 	int open();
 	cv::Mat get_frame();
-	std::vector <uchar> get_jpeg_frame();
+	std::vector <unsigned char> get_jpeg_frame();
 };
