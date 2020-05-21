@@ -57,14 +57,13 @@ int32_t Client::Send(const char *msg, int32_t type, int32_t length = -1)
   
   char metaData[5];
   metaData[0] = type;
-  metaData[1] = (length >> 24) & 0xFF;
-  metaData[2] = (length >> 16) & 0xFF;
-  metaData[3] = (length >> 8 ) & 0xFF;
-  metaData[4] =  length        & 0xFF;
+  metaData[1] = (length      ) & 0xFF;
+  metaData[2] = (length >> 8 ) & 0xFF;
+  metaData[3] = (length >> 16) & 0xFF;
+  metaData[4] = (length >> 24) & 0xFF;
 
   SendAll(fd_, metaData, 5, 0);
-  SendAll(fd_, msg, length, 0 ); 
-  std::cout << "Message sent\n";   
+  SendAll(fd_, msg, length, 0); 
 }
 //=============================================================================
 int32_t *Client::Read(char *msg)
@@ -74,7 +73,7 @@ int32_t *Client::Read(char *msg)
   int32_t value = read(fd_, metaBuffer, 5);
 
   metaData[0] = metaBuffer[0];
-  metaData[1] = (int32_t)(metaBuffer + 1);
+  metaData[1] = *(int32_t *)(metaBuffer + 1);
 
   value = 0;
   int32_t increment = 0;
@@ -85,7 +84,7 @@ int32_t *Client::Read(char *msg)
   	value += increment;
   	msg   += increment;
   }
-  
+
   return metaData;
 }
 //=============================================================================
