@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <sys/types.h>
+#include <unistd.h>
+#include <time.h>
 #include "opencv2/opencv.hpp"
 
 #include "connection.cpp"
@@ -11,10 +14,8 @@ int main(int argc, char *argv[])
   Camera camera;
   Window window;
 
-  if (argc < 2) {
-    camera.open();
-    std::cout << "Camera opened" << std::endl;
-  }
+  camera.open();
+  std::cout << "Camera is opened" << std::endl;
 
   char buffer[MAX_SIZE];
   memset(buffer, 0, MAX_SIZE);
@@ -23,38 +24,32 @@ int main(int argc, char *argv[])
 
   c.Read(buffer);
   std::cout << buffer;
-  
-  /*while (1)
-  {
-    memset(buffer, 0, 1024);
-    fgets(buffer, sizeof(buffer), stdin);
-    c.Send(buffer);
-    memset(buffer, 0, 1024);
-    c.Read(buffer);
-    std::cout << buffer << "\n";
-  }*/
+
+  int pid = fork();
 
   while (true) {
-    int key;
-
-    if (argc < 2) {
-      std::vector <unsigned char> buff = camera.get_jpeg_frame();
-      //buff.push_back('\0');
-      c.Send(buff.data(), buff.size());
-      std::cout << "Buff size: " << buff.size() << std::endl;
-      key = window.show_jpeg(buff, 10);
-    } else {
+    if (pid != 0) {
       memset(buffer, 0, MAX_SIZE);
       int size = c.Read(buffer);
-      std::vector <unsigned char> buff_2(buffer, buffer + size);
-      std::cout << "Got size: " << size << std::endl;
-      //buff_2.pop_back();
-      std::cout << "Buff_2 size: " << buff_2.size() << std::endl;
 
-      key = window.show_jpeg(buff_2, 10);
+      std::vector <unsigned char> buff_2(buffer, buffer + size);
+      std::cout << "Size of recieved buffer: " << buff_2.size() << std::endl;
+
+      int key = window.show_jpeg(buff_2, 10);
+
+      if(key == 27) { // stop capturing by pressing ESC
+        char pid_str[50];
+        sprintf(pid_str, "%d", pid);
+        execlp("kill", "kill", pid_str, (char *)NULL);
+        break;
+      } 
+
+    } else {
+      std::vector <unsigned char> buff = camera.get_jpeg_frame();
+      c.Send(buff.data(), buff.size());
+      std::cout << "Size of sent buffer: " << buff.size() << std::endl;
+      usleep(40000);
     }
-    //std::cout << buff.size() << std::endl;
-    if(key == 27) break; // stop capturing by pressing ESC 
   }
 
 
