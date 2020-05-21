@@ -1,6 +1,21 @@
 //=============================================================================
 #include "client.hpp"
 //=============================================================================
+int SendAll(int32_t fd, const char *buffer, int32_t length, int32_t flags) 
+{
+	int32_t total = 0;
+	int32_t n     = 0;
+
+	while (total < length) 
+  {
+		n = send(fd, buffer + total, length - total, flags);
+		if (n == -1) break;
+		total += n;
+	}
+
+	return (n == -1 ? -1 : total);
+}
+//=============================================================================
 Client::Client(int32_t port)
 {
   port_ = port;
@@ -39,7 +54,7 @@ int32_t Client::Connect(const char *address)
 int32_t Client::Send(const char *msg, int32_t length = -1)
 {
   if (length == -1) length = strlen(msg);
-  send(fd_, msg, length, 0); 
+  SendAll(fd_, msg, length, 0); 
   std::cout << "Message sent\n";   
 }
 //=============================================================================

@@ -1,6 +1,21 @@
 //=============================================================================
 #include "server.hpp"
 //=============================================================================
+int SendAll(int32_t fd, const char *buffer, int32_t length, int32_t flags) 
+{
+	int32_t total = 0;
+	int32_t n     = 0;
+
+	while (total < length) 
+  {
+		n = send(fd, buffer + total, length - total, flags);
+		if (n == -1) break;
+		total += n;
+	}
+
+	return (n == -1 ? -1 : total);
+}
+//=============================================================================
 Server::Server(int32_t port)
 {
   int32_t shm_key = ftok("test.txt", 1);
@@ -59,7 +74,7 @@ int32_t Server::Start()
 int32_t Server::Send(const char *msg, int32_t num, int32_t length = -1)
 {
   if (length == -1) length = strlen(msg);
-  send(users_[keys_[num]], msg, length, 0 ); 
+  SendAll(users_[keys_[num]], msg, length, 0); 
 }
 //=============================================================================
 int32_t Server::Read(char *msg, int32_t num)
