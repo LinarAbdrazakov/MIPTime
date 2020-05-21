@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 
   char buffer[MAX_SIZE];
   memset(buffer, 0, MAX_SIZE);
-  Client c(25572);
+  Client c(25576);
   c.Connect("109.71.10.212");
 
   c.Read(buffer);
@@ -26,7 +26,8 @@ int main(int argc, char *argv[])
   while (true) {
     if (pid != 0) {
       memset(buffer, 0, MAX_SIZE);
-      int size = c.Read(buffer);
+      int32_t *metaData = c.Read(buffer);
+      int size = metaData[0];
 
       std::vector <unsigned char> buff_2(buffer, buffer + size);
       std::cout << "Size of recieved buffer: " << buff_2.size() << std::endl;
@@ -41,8 +42,8 @@ int main(int argc, char *argv[])
       }
 
     } else {
-      std::vector <unsigned char> buff = camera.get_jpeg_frame();
-      c.Send(buff.data(), buff.size());
+      std::vector <unsigned char> buff = camera.get_jpeg_frame(20);
+      c.Send(buff.data(), Client::VID, buff.size());
       std::cout << "Size of sent buffer: " << buff.size() << std::endl;
       usleep(40000);
     }
