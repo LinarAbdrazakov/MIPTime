@@ -51,17 +51,41 @@ int32_t Client::Connect(const char *address)
   return 0;
 }
 //=============================================================================
-int32_t Client::Send(const char *msg, int32_t length = -1)
+int32_t Client::Send(const char *msg, int32_t type, int32_t length = -1)
 {
   if (length == -1) length = strlen(msg);
-  SendAll(fd_, msg, length, 0); 
+  
+  char metaData[5];
+  metaData[0] = type;
+  metaData[1] = (length >> 24) & 0xFF;
+  metaData[2] = (length >> 16) & 0xFF;
+  metaData[3] = (length >> 8 ) & 0xFF;
+  metaData[4] =  length        & 0xFF;
+
+  SendAll(fd_, metaData, 5, 0);
+  SendAll(fd_, msg, length, 0 ); 
   std::cout << "Message sent\n";   
 }
 //=============================================================================
-int32_t Client::Read(char *msg)
+int32_t *Client::Read(char *msg)
 {
-  int32_t value;
-  value = read( fd_ , msg, MAX_SIZE); 
-  return value;
+  int32_t *metaData = new int32_t [2];
+  char metaBuffer[5];
+  int32_t value = read(fd_, metaBuffer, 5);
+
+  metaData[0] = metaBuffer[0];
+  metaData[1] = (int32_t)(metaBuffer + 1);
+
+  value = 0;
+  int32_t increment = 0;
+  int32_t length    = metaData[1];
+  while (value < length)
+  {
+  	increment = read(fd_, msg, length - value); 
+  	value += increment;
+  	msg   += increment;
+  }
+  
+  return metaData;
 }
 //=============================================================================
