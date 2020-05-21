@@ -99,7 +99,7 @@ void Server::DelUser(int32_t num)
   --shmData_[USERS_NUM];
   if (shmData_[USERS_NUM] != 0)
   {
-    Send("Other user leaved\n", 0);
+    //Send("Other user leaved\n", 0);
   }
   std::cout << "User leaved\n"; 
 }
@@ -114,12 +114,12 @@ void Server::UsersWaiting()
     {
       AddUser();
       std::cout << "User joined\n"; 
-      Send("Hello, you are the first one, wait for the second user\n", keys_[0]);    
+      //Send("Hello, you are the first one, wait for the second user\n", keys_[0]);    
     }
 
     AddUser();
     std::cout << "User joined\n"; 
-    Send("Hello, you are the second one\n", keys_[1]); 
+    //Send("Hello, you are the second one\n", keys_[1]); 
     Update();
   }
 
