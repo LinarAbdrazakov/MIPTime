@@ -3,18 +3,9 @@
 //=============================================================================
 int main()
 {
-  Server s(25572);
+  Server s(25620);
   s.Start();
-  /*
-  while(1)
-  {
-    s.UsersWaiting();
 
-    std::thread thread(&Server::UsersProcessing, &s, 0);
-    s.UsersProcessing(1);
-    thread.join();
-    std::cout << "Cicle\n"
-  }//*/
   while(1)
   {
     s.UsersWaiting();
@@ -29,6 +20,6 @@ int main()
       while(1);
     }
     std::cout << "User leaved\n";
-  }//*/
+  }
 }
 //=============================================================================
