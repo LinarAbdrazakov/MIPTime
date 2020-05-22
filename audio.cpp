@@ -35,7 +35,7 @@ void Microphone::GetAvailableSamples(unsigned char *captureBufPtr, int32_t &samp
     if (samplesAvailable > 0) {
         alcCaptureSamples(captureDev, captureBufPtr, samplesAvailable);
         samplesCaptured = samplesAvailable;
-        std::cout << "Captured " << samplesCaptured << " samples (adding " << samplesAvailable << ")\r";
+        std::cout << "Captured " << samplesCaptured << " samples (adding " << samplesAvailable << ")" << std::endl;
 
         // (two bytes per sample * number of samples)
         bytes = samplesAvailable * 2;
@@ -75,9 +75,27 @@ void AudioPlayer::CreateContext() {
 }
 
 void AudioPlayer::Play(unsigned char *captureBuffer, int samplesCaptured) {
+	static int not_first = 0;
+
+	int bytes = 2 * samplesCaptured;
+	unsigned char cloneBuffer[100000];
+	for (int i = 0; i < bytes; ++i) {
+		cloneBuffer[i] = captureBuffer[i];
+	}
+
+	// Wait for the source to stop playing
+	if (not_first) {
+		playState = AL_PLAYING;
+		while (playState == AL_PLAYING) {
+			alGetSourcei(source, AL_SOURCE_STATE, &playState);
+		}
+	}
+
+	not_first = 1;
+
 	alGenBuffers(1, &buffer);
 	alGenSources(1, &source);
-	alBufferData(buffer, AL_FORMAT_MONO16, captureBuffer, samplesCaptured*2, 8000);
+	alBufferData(buffer, AL_FORMAT_MONO16, cloneBuffer, samplesCaptured*2, 8000);
 
 	alSourcei(source, AL_BUFFER, buffer);
 	alSourcef(source, AL_GAIN, 1.0f);
@@ -85,14 +103,10 @@ void AudioPlayer::Play(unsigned char *captureBuffer, int samplesCaptured) {
 
 	alSourcePlay(source);
 
-	// Wait for the source to stop playing
-	playState = AL_PLAYING;
-	while (playState == AL_PLAYING) {
-		alGetSourcei(source, AL_SOURCE_STATE, &playState);
-	}
-
 	std::cout << "Played " << samplesCaptured << " samples." << std::endl;
 }
+
+
 
 void AudioPlayer::CloseDevice() {
 	// Shut down OpenAL
