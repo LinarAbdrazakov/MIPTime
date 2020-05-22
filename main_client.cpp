@@ -10,7 +10,7 @@
 
 int main(int argc, char *argv[])
 {
-  Client c(25598);
+  Client c(25610);
   c.Connect("109.71.10.212");
 
   //c.Read(buffer);
@@ -75,15 +75,14 @@ int main(int argc, char *argv[])
 
     while (true) {
       // Send frame
-      std::vector <unsigned char> buff = camera.get_jpeg_frame(20);
-      c.Send(buff.data(), Client::VID, buff.size());
-      std::cout << "Size of sent video-buffer: " << buff.size() << std::endl;
+      //std::vector <unsigned char> buff = camera.get_jpeg_frame(20);
+      //c.Send(buff.data(), Client::VID, buff.size());
+      //std::cout << "Size of sent video-buffer: " << buff.size() << std::endl;
       // Send sound
       mic.GetAvailableSamples(buffer_send, samplesCaptured, bytes);
-      std::cout << "Got samples" << std::endl;
       c.Send(buffer_send, Client::AUD, bytes);
       std::cout << "Size of sent audio-buffer: " << bytes << std::endl;
-      usleep(40000);
+      usleep(100000);
     }
 
     mic.CaptureStop();
