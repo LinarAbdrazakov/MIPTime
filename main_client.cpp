@@ -16,9 +16,7 @@ int main(int argc, char *argv[])
   //c.Read(buffer);
   //std::cout << buffer;
 
-
   int pid = fork();
-
 
   if (pid != 0) {
 
