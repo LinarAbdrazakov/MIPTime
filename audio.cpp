@@ -35,7 +35,7 @@ void Microphone::GetAvailableSamples(unsigned char *captureBufPtr, int32_t &samp
     if (samplesAvailable > 0) {
         alcCaptureSamples(captureDev, captureBufPtr, samplesAvailable);
         samplesCaptured = samplesAvailable;
-        std::cout << "Captured " << samplesCaptured << " samples (adding " << samplesAvailable << ")" << std::endl;
+        //std::cout << "Captured " << samplesCaptured << " samples (adding " << samplesAvailable << ")" << std::endl;
 
         // (two bytes per sample * number of samples)
         bytes = samplesAvailable * 2;
@@ -103,7 +103,7 @@ void AudioPlayer::Play(unsigned char *captureBuffer, int samplesCaptured) {
 
 	alSourcePlay(source);
 
-	std::cout << "Played " << samplesCaptured << " samples." << std::endl;
+	//std::cout << "Played " << samplesCaptured << " samples." << std::endl;
 }
 
 
